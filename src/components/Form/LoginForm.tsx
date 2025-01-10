@@ -1,57 +1,46 @@
 "use client";
 
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
 
-const RegisterForm = () => {
-  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
+const LoginForm = () => {
+  const { push } = useRouter();
+
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    const email = e.currentTarget.email.value;
+    const password = e.currentTarget.password.value;
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        fullname: formData.get("fullname"),
-        email: formData.get("email"),
-        password: formData.get("password"),
-      }),
-    });
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
 
-    if (res.ok) {
-      alert("Berhasil");
-    } else {
-      alert("Gagal");
+      if (!res?.error) {
+        push("/");
+      } else {
+        if (res.status === 401) {
+          alert("Email or password is incorrect");
+        }
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   return (
     <form
       className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md"
-      onSubmit={handleRegister}
+      onSubmit={handleLogin}
     >
       <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-        Register
+        Login
       </h2>
       <div className="space-y-4">
-        <div>
-          <label
-            htmlFor="fullname"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Full Name
-          </label>
-          <input
-            type="text"
-            name="fullname"
-            id="fullname"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="John Doe"
-          />
-        </div>
         <div>
           <label
             htmlFor="email"
@@ -63,7 +52,7 @@ const RegisterForm = () => {
             type="email"
             name="email"
             id="email"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
             placeholder="john@example.com"
           />
         </div>
@@ -86,11 +75,11 @@ const RegisterForm = () => {
           type="submit"
           className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300"
         >
-          Register
+          Login
         </button>
       </div>
     </form>
   );
 };
 
-export default RegisterForm;
+export default LoginForm;
