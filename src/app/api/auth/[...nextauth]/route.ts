@@ -52,17 +52,23 @@ const authOptions: NextAuthOptions = {
 
   callbacks: {
     async jwt({ token, account, user }) {
-      if (account?.provider === "credentials") {
-        token.email = user.email;
-        token.id = user.id;
+      if (account?.provider === "credentials" && user) {
+        const customUser = user as UserData;
+        token.id = customUser.id;
+        token.email = customUser.email;
+        token.fullname = customUser.fullname;
+        token.role = customUser.role;
       }
-
       return token;
     },
 
     async session({ session, token }) {
       session.user = {
-        email: token.email,
+        ...session.user,
+        id: token.id as string,
+        fullname: token.fullname as string,
+        email: token.email as string,
+        role: token.role as string | undefined,
       };
       return session;
     },
