@@ -7,8 +7,13 @@ import {
   where,
   getDocs,
   addDoc,
+  updateDoc,
+  arrayUnion,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import bcrypt from "bcrypt";
+import { Product } from "@/types/Product";
 
 const firestore = getFirestore(app);
 
@@ -77,5 +82,41 @@ export async function login(data: { email: string }) {
     return user[0];
   } else {
     return null;
+  }
+}
+
+export async function addProductToCart(userId: string, product: Product) {
+  if (!userId) {
+    throw new Error("User ID is required to add items to the cart.");
+  }
+
+  try {
+    const userRef = doc(firestore, "users", userId);
+
+    // Ambil data keranjang pengguna
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+
+    // Periksa apakah produk sudah ada di keranjang
+    const cart = userData?.cart || [];
+    const existingProduct = cart.find(
+      (item: Product) => item.id === product.id
+    );
+
+    if (existingProduct) {
+      // Jika produk sudah ada, tingkatkan jumlah (quantity)
+      const updatedCart = cart.map((item: Product) =>
+        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+      );
+      await updateDoc(userRef, { cart: updatedCart });
+    } else {
+      // Jika produk belum ada, tambahkan ke keranjang
+      await updateDoc(userRef, {
+        cart: arrayUnion({ ...product, quantity: 1 }),
+      });
+    }
+  } catch (error) {
+    console.error("Error adding to cart: ", error);
+    throw new Error("Failed adding to cart");
   }
 }
