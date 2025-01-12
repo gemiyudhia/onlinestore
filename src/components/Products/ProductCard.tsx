@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import useCartStore from "@/lib/zustand/useCartStore";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { data: session } = useSession();
+  const addToCart = useCartStore((state) => state.addToCart)
 
   const handleAddToCart = async () => {
     const userId = session?.user.id;
@@ -37,12 +39,23 @@ export default function ProductCard({ product }: { product: Product }) {
       });
 
       if (!response.ok) throw new Error("Failed to add product to cart");
+
+      // Tambahkan ke Zustand setelah berhasil
+      addToCart({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        image: product.image,
+        quantity: 1,
+      });
+
       alert(`Added ${product.title} to cart`);
     } catch (error) {
       console.error(error);
       alert("Failed to add product to cart.");
     }
   };
+
 
   return (
     <Card className="flex flex-col h-full">

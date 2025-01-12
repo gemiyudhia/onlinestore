@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import bcrypt from "bcrypt";
 import { Product } from "@/types/Product";
+import useCartStore from "../zustand/useCartStore";
 
 const firestore = getFirestore(app);
 
@@ -120,3 +121,30 @@ export async function addProductToCart(userId: string, product: Product) {
     throw new Error("Failed adding to cart");
   }
 }
+
+export async function fetchCartFromFirestore(userId: string) {
+  if (!userId) {
+    throw new Error("User ID is required to fetch cart");
+  }
+
+  try {
+    const userRef = doc(firestore, "users", userId);
+    const userDoc = await getDoc(userRef);
+
+    if (!userDoc.exists()) {
+      console.log("User not found");
+      return [];
+    }
+
+    const userData = userDoc.data();
+    const cart = userData?.cart || []; // Ambil cart jika ada
+
+    // Simpan cart ke Zustand
+    useCartStore.getState().setCart(cart); // Memasukkan cart dari Firestore ke Zustand
+    return cart;
+  } catch (error) {
+    console.error("Error fetching cart: ", error);
+    throw new Error("Failed to fetch cart from Firestore");
+  }
+}
+
