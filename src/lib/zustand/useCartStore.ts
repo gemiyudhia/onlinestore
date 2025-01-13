@@ -1,13 +1,12 @@
-import { CartState } from "@/types/CartState";
 import { create } from "zustand";
+import { CartState } from "@/types/CartState";
 
 const useCartStore = create<CartState>((set) => ({
-  cart: [], // Awal state cart adalah array kosong
+  cart: [],
   addToCart: (newItem) =>
     set((state) => {
       const existingItem = state.cart.find((item) => item.id === newItem.id);
       if (existingItem) {
-        // Jika item sudah ada, update quantity
         return {
           cart: state.cart.map((item) =>
             item.id === newItem.id
@@ -16,12 +15,43 @@ const useCartStore = create<CartState>((set) => ({
           ),
         };
       }
-      // Jika item baru, tambahkan ke cart
       return {
         cart: [...state.cart, newItem],
       };
     }),
-  setCart: (cart) => set({ cart }), // Action untuk menyimpan seluruh cart
+  removeFromCart: async (itemId, userId) => {
+    try {
+      const res = await fetch(`/api/cart`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, itemId }),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        // Perbarui state lokal
+        set((state) => ({
+          cart: state.cart
+            .map((item) => {
+              if (item.id === itemId) {
+                if (item.quantity > 1) {
+                  return { ...item, quantity: item.quantity - 1 };
+                }
+                return null;
+              }
+              return item;
+            })
+            .filter((item) => item !== null), // Hapus item jika quantity sudah 1
+        }));
+      } else {
+        console.error(result.error);
+      }
+    } catch (error) {
+      console.error("Error removing item from cart: ", error);
+    }
+  },
+  setCart: (cart) => set({ cart }),
 }));
 
 export default useCartStore;

@@ -15,6 +15,7 @@ import {
 import bcrypt from "bcrypt";
 import { Product } from "@/types/Product";
 import useCartStore from "../zustand/useCartStore";
+import { CartItem } from "@/types/CartItem";
 
 const firestore = getFirestore(app);
 
@@ -137,10 +138,9 @@ export async function fetchCartFromFirestore(userId: string) {
     }
 
     const userData = userDoc.data();
-    const cart = userData?.cart || []; // Ambil cart jika ada
+    const cart = userData?.cart || [];
 
-    // Simpan cart ke Zustand
-    useCartStore.getState().setCart(cart); // Memasukkan cart dari Firestore ke Zustand
+    useCartStore.getState().setCart(cart);
     return cart;
   } catch (error) {
     console.error("Error fetching cart: ", error);
@@ -148,3 +148,42 @@ export async function fetchCartFromFirestore(userId: string) {
   }
 }
 
+export async function removeFromCartFirestore(userId: string, itemId: number) {
+  try {
+    // Referensi ke dokumen user berdasarkan userId
+    const userDocRef = doc(firestore, "users", userId);
+
+    // Ambil data user dari Firestore
+    const userDocSnap = await getDoc(userDocRef);
+    const userData = userDocSnap.data();
+
+    if (!userData || !userData.cart) {
+      throw new Error("Cart not found or no items to remove.");
+    }
+
+     const cart = userData.cart as CartItem[];
+
+    // Cari item dalam cart berdasarkan itemId
+    const updatedCart = cart
+      .map((item) => {
+        if (item.id === itemId) {
+          if (item.quantity > 1) {
+            // Jika quantity lebih dari 1, kurangi quantity
+            return { ...item, quantity: item.quantity - 1 };
+          }
+          // Jika quantity 1, hapus item dari cart
+          return null;
+        }
+        return item;
+      })
+      .filter((item) => item !== null); // Hapus item yang null (jika quantity sudah 1)
+
+    // Update array cart di Firestore
+    await updateDoc(userDocRef, { cart: updatedCart });
+
+    console.log(`Item with ID ${itemId} updated in cart (quantity decreased).`);
+  } catch (error) {
+    console.error("Error removing item from cart in Firestore: ", error);
+    throw error;
+  }
+}

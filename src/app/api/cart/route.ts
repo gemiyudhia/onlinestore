@@ -1,6 +1,7 @@
 import {
   addProductToCart,
   fetchCartFromFirestore,
+  removeFromCartFirestore,
 } from "@/lib/firebase/service";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -37,6 +38,32 @@ export async function GET(req: NextRequest) {
     console.log("Error in api route: ", error);
     return NextResponse.json(
       { error: "Failed to fetch cart" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { userId, itemId } = await req.json();
+
+    if (!userId || !itemId) {
+      return NextResponse.json(
+        { error: "User ID and Item ID are required" },
+        { status: 400 }
+      );
+    }
+
+    await removeFromCartFirestore(userId, itemId);
+
+    return NextResponse.json({
+      status: true,
+      message: `Item with ID ${itemId} updated in cart (quantity decreased).`,
+    });
+  } catch (error) {
+    console.error("Error removing item from cart in Firestore: ", error);
+    return NextResponse.json(
+      { error: "Failed to remove item from cart" },
       { status: 500 }
     );
   }
