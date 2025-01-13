@@ -1,7 +1,6 @@
 "use client";
 
 import { Product } from "@/types/Product";
-// import Image from "next/image";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
