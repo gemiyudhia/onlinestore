@@ -30,6 +30,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
+        <Link href="/" className="font-bold text-2xl italic">GemiStore</Link>
         <div className="ml-auto flex items-center space-x-4">
           {status === "authenticated" && <h4>{session?.user?.fullname}</h4>}
 
@@ -104,7 +105,7 @@ export function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem>
-                <Link href="/order-history" className="w-full">
+                <Link href="/order" className="w-full">
                   Order History
                 </Link>
               </DropdownMenuItem>

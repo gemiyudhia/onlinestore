@@ -9,13 +9,13 @@ import CartItems from "./CartItem";
 
 export default function CheckoutContent() {
   const { data: session, status } = useSession();
-  const router = useRouter();
+  const { push } = useRouter();
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/api/auth/signin");
+      push("/api/auth/signin");
     }
-  }, [status, router]);
+  }, [status]);
 
   if (status === "loading") {
     return <div>Loading...</div>;

@@ -19,8 +19,8 @@ export default function CheckoutForm({
   userEmail,
   userName,
 }: CheckoutFormProps) {
-  const [address, setAddress] = useState("");
-  const [error, setError] = useState("");
+  const [address, setAddress] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const { push } = useRouter();
   const { cart } = useCartStore();
 

@@ -10,7 +10,7 @@ import { useSession } from "next-auth/react";
 export default function CartItems() {
   const { data: session } = useSession();
   const { cart, removeFromCart } = useCartStore();
-  const [isClient, setIsClient] = useState(false);
+  const [isClient, setIsClient] = useState<boolean>(false);
 
   const userId = session?.user?.id;
 
