@@ -11,11 +11,13 @@ import {
   arrayUnion,
   doc,
   getDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import bcrypt from "bcrypt";
 import { Product } from "@/types/Product";
 import useCartStore from "../zustand/useCartStore";
 import { CartItem } from "@/types/CartItem";
+import { CheckoutUserData } from "@/types/CheckoutUserData";
 
 const firestore = getFirestore(app);
 
@@ -161,7 +163,7 @@ export async function removeFromCartFirestore(userId: string, itemId: number) {
       throw new Error("Cart not found or no items to remove.");
     }
 
-     const cart = userData.cart as CartItem[];
+    const cart = userData.cart as CartItem[];
 
     // Cari item dalam cart berdasarkan itemId
     const updatedCart = cart
@@ -185,5 +187,45 @@ export async function removeFromCartFirestore(userId: string, itemId: number) {
   } catch (error) {
     console.error("Error removing item from cart in Firestore: ", error);
     throw error;
+  }
+}
+
+export async function checkoutOrders(data: CheckoutUserData) {
+  try {
+    const userRef = doc(firestore, "users", data.userId);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      return { error: "user not found", status: 404 };
+    }
+
+    const userData = userSnap.data();
+    const userCart = userData.cart;
+
+    if (!userCart || userCart.length === 0) {
+      return { error: "cart is empty", status: 400 };
+    }
+
+    const orderData = {
+      userId: data.userId,
+      fullname: data.fullname,
+      email: data.email,
+      totalPrice: data.totalPrice,
+      cart: userCart,
+      createdAt: serverTimestamp(),
+    };
+
+    const orderRef = await addDoc(collection(firestore, "orders"), orderData);
+
+    await updateDoc(userRef, { cart: [] });
+
+    return {
+      message: "order created successfully",
+      orderId: orderRef.id,
+      status: 201,
+    };
+  } catch (error) {
+    console.error("Error in checkoutOrders: ", error);
+    return { error: error, status: 500 };
   }
 }

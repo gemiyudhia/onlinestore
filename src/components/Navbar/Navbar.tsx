@@ -104,6 +104,11 @@ export function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem>
+                <Link href="/order-history" className="w-full">
+                  Order History
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
                 {status === "authenticated" ? (
                   <Button onClick={() => signOut()} className="bg-red-500">
                     Logout
