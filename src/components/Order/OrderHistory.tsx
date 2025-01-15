@@ -62,7 +62,7 @@ const OrderHistory = () => {
       <Card className="max-w-4xl mx-auto mt-10">
         <CardContent className="p-6">
           <p className="text-center text-xl mb-4">You have no order history.</p>
-          <Link href="/shop" passHref>
+          <Link href="/" passHref>
             <Button className="w-full">Go to Shop</Button>
           </Link>
         </CardContent>
