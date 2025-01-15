@@ -22,7 +22,7 @@ This is an e-commerce web application built with modern technologies to provide 
 
 - **Next.js API Routes**: For handling server-side logic.
 - **Firebase**: Used for authentication and database.
-- **Nextauth**: 
+- **Nextauth**: Simplifies authentication flows.
 
 ### State Management
 
@@ -93,6 +93,5 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ## Contact
 
-For any questions or support, please open an issue or contact the repository owner.
-email: [gemiyudhiaa@gmail.com](mailto\:gemiyudhiaa@gmail.com)
-
+For any questions or support, feel free to open an issue or contact me:
+📧 [gemiyudhiaa@gmail.com](mailto\:gemiyudhiaa@gmail.com)
