@@ -210,6 +210,7 @@ export async function checkoutOrders(data: CheckoutUserData) {
       userId: data.userId,
       fullname: data.fullname,
       email: data.email,
+      address: data.address,
       totalPrice: data.totalPrice,
       cart: userCart,
       createdAt: serverTimestamp(),

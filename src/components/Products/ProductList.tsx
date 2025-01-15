@@ -5,6 +5,7 @@ import { Product } from "@/types/Product";
 import ProductCard from "./ProductCard";
 import ProductFilter from "./ProductFilter";
 import Loading from "../Loading/LoadingProducts";
+import { fetchProducts } from "@/lib/service/apiServices";
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -13,12 +14,10 @@ export default function ProductList() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const loadProducts = async () => {
       setIsLoading(true); // Mulai loading
       try {
-        const res = await fetch("/api/products");
-        if (!res.ok) throw new Error("Failed to fetch products");
-        const data: Product[] = await res.json();
+        const data = await fetchProducts();
         setProducts(data);
         setFilteredProducts(data);
 
@@ -33,11 +32,11 @@ export default function ProductList() {
       } catch (error) {
         console.error(error);
       } finally {
-        setIsLoading(false); // Selesai loading
+        setIsLoading(false);
       }
     };
 
-    fetchProducts();
+    loadProducts();
   }, []);
 
   const handleFilterChange = (filters: {

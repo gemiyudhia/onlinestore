@@ -15,7 +15,7 @@ export default function CheckoutContent() {
     if (status === "unauthenticated") {
       push("/api/auth/signin");
     }
-  }, [status]);
+  }, [push, status]);
 
   if (status === "loading") {
     return <div>Loading...</div>;

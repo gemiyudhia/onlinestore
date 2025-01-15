@@ -15,31 +15,26 @@ import { Accordion } from "@/components/ui/accordion";
 import OrderItem from "./OrderItem";
 import { Order } from "@/types/Order";
 import OrderHistoryLoading from "../Loading/OrderHistoryLoading";
+import { fetchUserOrders } from "@/lib/service/apiServices";
 
 const OrderHistory = () => {
   const { data: session, status } = useSession();
   const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const loadOrders = async () => {
       if (session?.user.id) {
         try {
-          const res = await fetch(`/api/orders?userId=${session.user.id}`);
-          const data = await res.json();
-
-          if (res.ok) {
-            setOrders(data);
-          } else {
-            console.error("Failed to fetch orders:", data.error);
-          }
+          const data = await fetchUserOrders(session.user.id);
+          setOrders(data);
         } catch (error) {
-          console.error("Error fetching orders:", error);
+          console.log("Error fetching orders:", error);
         }
       }
     };
 
     if (status === "authenticated") {
-      fetchOrders();
+      loadOrders();
     }
   }, [session, status]);
 

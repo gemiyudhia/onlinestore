@@ -3,11 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, fullname, email, totalPrice } = await req.json();
+    const { userId, fullname, address, email, totalPrice } = await req.json();
     const result = await checkoutOrders({
       userId,
       fullname,
       email,
+      address,
       totalPrice,
     });
 

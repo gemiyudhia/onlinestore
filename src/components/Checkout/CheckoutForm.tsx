@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CardFooter } from "@/components/ui/card";
 import useCartStore from "@/lib/zustand/useCartStore";
+import { submitCheckout } from "@/lib/service/apiServices";
 
 interface CheckoutFormProps {
   userId: string;
@@ -45,21 +46,10 @@ export default function CheckoutForm({
     };
 
     try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        push("/checkout/thank-you");
-      } else {
-        alert(result.error || "Failed to place order.");
-      }
+      await submitCheckout(orderData);
+      push("/checkout/thank-you");
     } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Something went wrong!");
+      alert(error || "Something went wrong!");
     }
   };
 
