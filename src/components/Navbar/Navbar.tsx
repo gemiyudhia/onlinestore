@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useCart } from "@/hooks/useCart";
+import { LoadingNavbar } from "../Loading/LoadingNavbar";
 
 export function Navbar() {
   const { data: session, status } = useSession();
@@ -27,10 +28,16 @@ export function Navbar() {
 
   const userId = session?.user?.id;
 
+  if (status === "loading") {
+    return <LoadingNavbar />;
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
-        <Link href="/" className="font-bold text-2xl italic">GemiStore</Link>
+        <Link href="/" className="font-bold text-2xl italic ml-5">
+          GemiStore
+        </Link>
         <div className="ml-auto flex items-center space-x-4">
           {status === "authenticated" && <h4>{session?.user?.fullname}</h4>}
 

@@ -4,28 +4,37 @@ import { useState, useEffect } from "react";
 import { Product } from "@/types/Product";
 import ProductCard from "./ProductCard";
 import ProductFilter from "./ProductFilter";
+import Loading from "../Loading/LoadingProducts";
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const res = await fetch("/api/products");
-      if (!res.ok) throw new Error("Failed to fetch products");
-      const data: Product[] = await res.json();
-      setProducts(data);
-      setFilteredProducts(data);
+      setIsLoading(true); // Mulai loading
+      try {
+        const res = await fetch("/api/products");
+        if (!res.ok) throw new Error("Failed to fetch products");
+        const data: Product[] = await res.json();
+        setProducts(data);
+        setFilteredProducts(data);
 
-      const uniqueCategories = Array.from(
-        new Set(
-          data
-            .map((product) => product.category)
-            .filter((category) => category !== undefined)
-        )
-      );
-      setCategories(uniqueCategories);
+        const uniqueCategories = Array.from(
+          new Set(
+            data
+              .map((product) => product.category)
+              .filter((category) => category !== undefined)
+          )
+        );
+        setCategories(uniqueCategories);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false); // Selesai loading
+      }
     };
 
     fetchProducts();
@@ -50,6 +59,10 @@ export default function ProductList() {
     });
     setFilteredProducts(filtered);
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div>

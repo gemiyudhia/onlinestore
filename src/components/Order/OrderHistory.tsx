@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion } from "@/components/ui/accordion";
 import OrderItem from "./OrderItem";
 import { Order } from "@/types/Order";
+import OrderHistoryLoading from "../Loading/OrderHistoryLoading";
 
 const OrderHistory = () => {
   const { data: session, status } = useSession();
@@ -41,6 +42,10 @@ const OrderHistory = () => {
       fetchOrders();
     }
   }, [session, status]);
+
+  if (status === "loading") {
+    return <OrderHistoryLoading />;
+  }
 
   if (!session) {
     return (
